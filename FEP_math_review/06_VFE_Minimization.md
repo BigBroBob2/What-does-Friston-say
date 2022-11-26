@@ -26,4 +26,4 @@ It shows that it's not possible to make all orders zero, unable to construct a s
 - $D \tilde{\mu}_\alpha \equiv \left ( \mu_{\alpha [0]}^{\prime}, \mu_{\alpha [1]}^{\prime}, \dots \right ) \equiv \left ( \mu_{\alpha}^{\prime}, \mu_{\alpha}^{\prime\prime}, \dots \right )$
 - $\dot{\tilde{\mu}}_\alpha = \frac{\partial}{\partial t} \tilde{\mu}_\alpha$
 - Therefore the gradient descent scheme of is restated as (*not quite understand here, recall Kalman filter? expect-update*):
-  - $\dot{\tilde{\mu}}_\alpha - D \tilde{\mu}_\alpha = - \kappa \hat{\mu}_{\alpha} \cdot  \nabla_{\mu_{\alpha}} E(\{\mu_{\alpha}\},\{\varphi_{\alpha}\})$ 
+  - $\dot{\tilde{\mu}}_\alpha - D \tilde{\mu}_\alpha = - \kappa \hat{\mu}_{\alpha} \cdot  \nabla_{\tilde{\mu}_{\alpha}} E(\{\mu_{\alpha}\},\{\varphi_{\alpha}\})$ 
