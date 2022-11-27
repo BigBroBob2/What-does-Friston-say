@@ -120,6 +120,7 @@ Generalised coordinates \& Higher-order motion
 - representing dynamical system states in increasingly higher order derivative of its state variables
 - For sensory data $\varphi$:
   - recursively higher order derivatives in form of $\varphi^{(n)} = \frac{\partial g}{\partial \mu} \mu^{(n)} + z^{(n)}$
+    - This is just denotation, e.g. $\varphi^{(2)} \equiv \varphi^{\prime\prime}$
     - note that $\{z^{(n)}\}$ are noise sources at each dynamic order and may be correlated
     - non-linear terms like ${\mu^{(n)}}^2$ and $\mu^{(n)}\mu^{(m)}$ are neglected under **local linear assumption**
   - denote
