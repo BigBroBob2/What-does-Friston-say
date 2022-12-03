@@ -1,0 +1,162 @@
+## Hierarchical generative model
+
+How the brain could modify and learn G-density $p(\varphi,\vartheta)$.
+
+The hierarchical generative model involves empirical *priors*.
+
+Use gradient descent scheme to allow brain to infer parameters and hyperparameters of VFE and learn world dynamics based on sensory data.
+
+### Hierarchical generative model
+Definition table
+|Symbol|Name \& Description|
+|:-|:-|
+|$\mu^{[i]}$        |brain states at cortex level $i, i=1,2,\dots,M$|
+|$\mu^{[0]}$        |$\mu^{[0]} \equiv \varphi$, the sensory data is at the lowest cortical level|
+|$g^{[i]}(\mu^{[i]})$   |Generative mapping functions of brain state $\mu^{[i]}$ to estimate lower level $\mu^{[i-1]}$|
+|$z^{[i]}$          |Guassian noise when estimating $\mu^{[i]}$|
+|$p \left ( \mu^{[M]} \right )$     |the highest level *prior*|
+
+Assume the agent possess some knowledges or beliefs of *priori*, how the world works, in the form of a pre-specified generative model.
+- However, FEP promises the ability to learn and infer arbitrary world dynamics.
+- To achieve this, the brain starts out with a very generative hierachical genrative model of world dynamics, refined and moduled through experience. 
+
+
+One benefit of using hierachical generative model is that the model avoids specifying explicit and fixed *prior* and thus can implement empirical Bayes.
+
+There is fundamental distinction between inference and learning
+- Inference means recognizing the current causes of sensory input by inferring time-variant latent world states
+- This is different from inferring the time-invariant parameters that mediate dependencies among time-variant states
+
+<!-- model -->
+
+Key challenge for Bayesian inference models is how to specify *priors*.
+- In hierachical models the higher layers provide empirical *priors*, or constraints on lower levels.
+- Here the hierachical models are mapped onto the hierachical organisation of cortex.
+
+Denote $\mu^{[i]}$ as brain states at cortex level $i, i=1,2,\dots,M$. The model can be written as:
+
+$\mu^{[0]} \equiv \varphi = g^{[1]}(\mu^{[1]})+z^{[0]}$
+
+$\mu^{[1]} = g^{[2]}(\mu^{[2]})+z^{[1]}$
+
+$\mu^{[i]} = g^{[i+1]}(\mu^{[i+1]})+z^{[i]}$
+
+$\mu^{[M]} = z^{[M]}, g^{[M+1]} \equiv 0$
+
+Thus we have the specific G-density $p(\varphi,\mu)$ in the hierarchical model:
+
+$p(\varphi,\mu) = p \left ( \varphi \mid \mu^{[1]}, \mu^{[2]},\dots,\mu^{[M]} \right ) p \left ( \mu^{[1]}, \mu^{[2]},\dots,\mu^{[M]} \right ) = p \left ( \mu^{[0]} \mid \mu^{[1]}, \mu^{[2]},\dots,\mu^{[M]} \right ) p \left ( \mu^{[1]}, \mu^{[2]},\dots,\mu^{[M]} \right )$
+
+Assume Markovian properties of the transition probabilities form higher to lower levels:
+$p(\varphi,\mu) = p \left ( \mu^{[0]} \mid \mu^{[1]} \right ) p \left ( \mu^{[0]} \mid \mu^{[1]} \right ) \dots p \left ( \mu^{[M-1]} \mid \mu^{[M]} \right ) p \left ( \mu^{[M]} \right )$
+
+The *prior* at the highest level $p \left ( \mu^{[M]} \right )$ is Guassian:
+
+$p \left ( \mu^{[M]} \right ) = \frac{1}{\sqrt{2\pi \sigma_{z}^{[M]}}} \exp \left ( -\frac{(\mu^{[M]})^2}{2\sigma_{z}^{[M]}} \right )$
+
+Assume $z^{[i]},i=1,2,\dots,M$ are independent, we have:
+
+$p \left ( \mu^{[i]} \mid \mu^{[i+1]} \right ) = \frac{1}{\sqrt{2\pi \sigma_{z}^{[i]}}} \exp \left ( -\frac{\left ( \mu^{[i]} - g^{[i+1]} (\mu^{[i+1]}) \right )^2}{2\sigma_{z}^{[i]}} \right )$
+
+$p(\varphi,\mu) = \Pi_{i=0}^{M} \left ( \frac{1}{\sqrt{2\pi\sigma_{z}^{[i]}}} \right ) \exp \left ( -\sum_{i=0}^{M} \frac{\sigma_{z}^{[i]} ( \varepsilon^{[i+1]} )^2}{2} \right )$
+
+Where $\varepsilon^{[i+1]}$ is the regularized *prediction error* when estimating lower level $\mu^{[i]}$ via $g^{[i+1]} (\mu^{[i+1]})$:
+
+$\varepsilon^{[i+1]} \equiv \frac{\mu^{[i]} - g^{[i+1]} (\mu^{[i+1]})}{\sigma_{z}^{[i]}}$
+
+Therefore we can write the Laplace-encoded energy as:
+
+$E(\mu,\varphi) = \frac{1}{2} \left ( \sum_{i=0}^{M} \sigma_{z}^{[i]} ( \varepsilon^{[i+1]} )^2 + \sum_{i=0}^{M} \ln \sigma_{z}^{[i]} \right )$
+
+Note that the noise at the top level of hierarchy is usually assumed to be large and thus approximately zero. This means the level below is effectively unconstrained (has no *prior*) and this type of inference is empirical Bayes.
+
+### Full contruction of generative model (combining hierarchical and dynamical models)
+
+Definition table
+|Symbol|Name \& Description|
+|:-|:-|
+|$\tilde{\mu}_{\alpha}^{[i]}$       |$\tilde{\mu}_{\alpha}^{[i]} = (\mu_{\alpha [0]}^{[i]},\mu_{\alpha [1]}^{[i]},\dots)^T$, the generalized coordinates of brain state $\alpha$ in the cortical level $i$|
+|$\tilde{\chi}_{\alpha}^{[i]}$      |the hidden state|
+|$\tilde{\upsilon}_{\alpha}^{[i]}$      |the causal state|
+|$\tilde{g}_{\alpha}^{[i]}$         |generative map to estimate the lower-level state $\tilde{\upsilon}_{\alpha}^{[i-1]}$|
+|$\tilde{f}_{\alpha}^{[i]}$         |generative function to estimate the hidden state motion $D\tilde{\chi}_{\alpha}^{[i]}$|
+|$\tilde{z}_{\alpha}^{[i]},\tilde{w}_{\alpha}^{[i]}$|Guassian noises|
+|$p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]})$|the *prior* density at the highest level $M$|
+|$p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]})$|the intra-level conditional probability of the hidden states $D\tilde{\chi}_{\alpha}^{[i]}$ conditioned in the causal state $\tilde{\upsilon}_{\alpha}^{[i]}$ via $\tilde{f}_{\alpha}^{[i]}$|
+|$p(\tilde{\upsilon}_\alpha^{[i]} \mid \tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]})$|likelihood density of the upper-level causal state $\tilde{\upsilon}_{\alpha}^{[i+1]}$ serves as *prior* for this-level causal states $\tilde{\upsilon}_{\alpha}^{[i]}$, the inter-level map between successive causal states|
+
+Firstly, we note the brain state $\mu_\alpha$ can be divided into **hidden** states $\chi_\alpha$  and **causal** states $\upsilon_\alpha$ (directly observable):
+
+$\mu_\alpha = (\chi_\alpha,\upsilon_\alpha)$
+
+Remember that the lowest level of the hierarchical model brain states are sensory data, $\mu_{\alpha}^{[0]} \equiv \varphi_\alpha$, where the **hidden** states can be considered as **not directly observable** sensory data, and the **causal** states can be considered as **directly observable** sensory data.
+
+Now we can generalize this distinction throughout every levels of the hierarchy. Each level is considered as **observing** only through the **causal** states of the lower level. Therefore we have:
+
+$\tilde{\upsilon}_{\alpha}^{[i]} = \tilde{g}_{\alpha}^{[i+1]} (\tilde{\chi}_{\alpha}^{[i+1]},\tilde{\upsilon}_{\alpha}^{[i+1]}) + \tilde{z}_{\alpha}^{[i]}$
+
+$D\tilde{\chi}_{\alpha}^{[i]} = \tilde{f}_{\alpha}^{[i]} (\tilde{\chi}_{\alpha}^{[i]},\tilde{\upsilon}_{\alpha}^{[i]}) + \tilde{w}_{\alpha}^{[i]}$
+
+Where the first function means that the causal states of the one-level lower level $\tilde{\upsilon}_{\alpha}^{[i]}$ is estimated by this level's prior $\tilde{g}_{\alpha}^{[i+1]}$, based on this level's brain states $\tilde{\chi}_{\alpha}^{[i+1]}$ and $\tilde{\upsilon}_{\alpha}^{[i+1]}$; the second function means that the higher order of the hidden states $D\tilde{\chi}_{\alpha}^{[i]}$ is estimated in brain belief by $\tilde{f}_{\alpha}^{[i]}$.
+
+Note that the lowest level of the causal states is the snesory data:
+
+$\tilde{\upsilon}_{\alpha}^{[0]} = \tilde{\varphi}_\alpha$
+
+The highest level of the causal states (*prior*) is large-variance fluctuations with zero means, but the generalized motions of the highest level hidden states are still present:
+
+$\tilde{g}_{\alpha}^{[M+1]} \equiv 0$
+
+$\tilde{\upsilon}_{\alpha}^{[M]} = \tilde{z}_{\alpha}^{[M]}$
+
+The generalized coordinates of the causal states and hidden states are denoted as:
+
+$\tilde{\upsilon}_{\alpha}^{[i]} \equiv ({\upsilon}_{\alpha [0]}^{[i]},{\upsilon}_{\alpha [1]}^{[i]}, \dots )^T$
+
+$\tilde{\chi}_{\alpha}^{[i]} \equiv ({\chi}_{\alpha [0]}^{[i]},{\chi}_{\alpha [1]}^{[i]}, \dots )^T$
+
+${\upsilon}_{\alpha [n]}^{[i]} \equiv \frac{d^n}{dt^n} {\upsilon}_{\alpha}^{[i]}$
+
+${\chi}_{\alpha [n]}^{[i]} \equiv \frac{d^n}{dt^n} {\chi}_{\alpha}^{[i]}$
+
+Use local-linearity assumption, we only have linear terms:
+
+${g}_{\alpha [n]}^{[i+1]} ({\chi}_{\alpha [n]}^{[i+1]},{\upsilon}_{\alpha [n]}^{[i+1]}) \equiv \frac{\partial g}{\partial {\upsilon}_{\alpha [n]}^{[i+1]}} {\upsilon}_{\alpha [n]}^{[i+1]} \equiv {g}_{\alpha [n]}^{[i+1]}$
+
+${f}_{\alpha [n]}^{[i+1]} ({\chi}_{\alpha [n]}^{[i]},{\upsilon}_{\alpha [n]}^{[i]}) \equiv \frac{\partial f}{\partial {\chi}_{\alpha [n]}^{[i]}} {\chi}_{\alpha [n]}^{[i]} \equiv {f}_{\alpha [n]}^{[i]}$
+
+${g}_{\alpha [0]}^{[i+1]} ({\chi}_{\alpha [0]}^{[i+1]},{\upsilon}_{\alpha [0]}^{[i+1]}) = g({\chi}_{\alpha [0]}^{[i+1]},{\upsilon}_{\alpha [0]}^{[i+1]})$
+
+${f}_{\alpha [0]}^{[i+1]} ({\chi}_{\alpha [0]}^{[i]},{\upsilon}_{\alpha [0]}^{[i]}) = f({\chi}_{\alpha [0]}^{[i]},{\upsilon}_{\alpha [0]}^{[i]})$
+
+Then we have G-density:
+
+$p(\tilde{\varphi},\tilde{\mu}) = \Pi_{\alpha=1}^{N} p(\tilde{\varphi}_\alpha,\tilde{\mu}_\alpha) = \Pi_{\alpha=1}^{N} \left ( p(\tilde{\mu}_\alpha^{[M]}) \Pi_{i=0}^{M-1} p(\tilde{\mu}_\alpha^{[i]} \mid \tilde{\mu}_\alpha^{[i+1]}) \right ) = \Pi_{\alpha=1}^{N} \left ( p(\tilde{\chi}_\alpha^{[M]},\tilde{\upsilon}_\alpha^{[M]}) \Pi_{i=0}^{M-1} p(\tilde{\chi}_\alpha^{[i]},\tilde{\upsilon}_\alpha^{[i]} \mid \tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]}) \right ) = \Pi_{\alpha=1}^{N} \left ( p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]}) \Pi_{i=0}^{M-1} p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]}) p(\tilde{\upsilon}_\alpha^{[i]} \mid \tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]}) \right )$
+
+Here we need to note that only the causal states $\tilde{\upsilon}_\alpha^{[i]}$ are involved in the inter-level transitions in the hierarchy, which means:
+
+$p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]},\tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]}) = p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]})$
+
+Also we have the following established fact:
+
+$p(\tilde{\chi}_\alpha^{[0]} \mid \tilde{\upsilon}_\alpha^{[0]}) = 1$
+
+About the intra-level conditional probability $p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]})$, we assume correlation $\Sigma_{w_\alpha}^{[i]}$ among the generalized states at different dynamical orders:
+
+$p(\tilde{\chi}_\alpha^{[i]} \mid \tilde{\upsilon}_\alpha^{[i]}) = \frac{1}{\sqrt{(2\pi)^{n_{\rm max}+1} | \Sigma_{w_{\alpha}}^{[i]} |}} \exp \left ( -\frac{1}{2}(D\tilde{\chi}_{\alpha}^{[i]}-\tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (D\tilde{\chi}_{\alpha}^{[i]}-\tilde{f}_{\alpha}^{[i]}) \right )$
+
+About the conditional probability $p(\tilde{\upsilon}_\alpha^{[i]} \mid \tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]})$ linking successive causal states, we assume correlation $\Sigma_{z_\alpha}^{[i]}$ among the generalized states at different dynamical orders:
+
+$p(\tilde{\upsilon}_\alpha^{[i]} \mid \tilde{\chi}_\alpha^{[i+1]},\tilde{\upsilon}_\alpha^{[i+1]}) = \frac{1}{\sqrt{(2\pi)^{n_{\rm max}+1} | \Sigma_{z_{\alpha}}^{[i]} |}} \exp \left ( -\frac{1}{2}(\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) \right )$
+
+About the *prior* density $p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]})$ at the highest level, we have:
+
+$p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]}) = \left ( \frac{1}{\sqrt{(2\pi)^{n_{\rm max}+1} | \Sigma_{z_{\alpha}}^{[M]} |}} \exp \left ( -\frac{1}{2}(\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) \right ) \right ) \left ( \frac{1}{\sqrt{(2\pi)^{n_{\rm max}+1} | \Sigma_{w_{\alpha}}^{[M]} |}} \exp \left ( -\frac{1}{2}(\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) \right ) \right )$
+
+Therefore we have the Laplace-encoded energy:
+
+$E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha}) = \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[M]} | + \frac{1}{2} (\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[M]} | + \sum_{i=1}^{M-1} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[i]} | + \frac{1}{2} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[i]} | \right )$
+
+$E (\tilde{\mu},\tilde{\varphi}) = \sum_{\alpha=1}^{N} E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha})$
+
+### The full construct recognition dynamics and neuronal activity
