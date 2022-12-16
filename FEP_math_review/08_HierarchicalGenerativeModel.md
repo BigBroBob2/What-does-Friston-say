@@ -103,7 +103,7 @@ Note that the lowest level of the causal states is the snesory data:
 
 $\tilde{\upsilon}_{\alpha}^{[0]} = \tilde{\varphi}_\alpha$
 
-The highest level of the causal states (*prior*) is large-variance fluctuations with zero means, but the generalized motions of the highest level hidden states are still present:
+The highest level $M$ of the causal states (*prior*) is large-variance fluctuations with zero means, but the generalized motions of the highest level hidden states are still present:
 
 $\tilde{g}_{\alpha}^{[M+1]} \equiv 0$
 
@@ -155,8 +155,51 @@ $p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]}) = \left ( \frac{1}{
 
 Therefore we have the Laplace-encoded energy:
 
-$E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha}) = \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[M]} | + \frac{1}{2} (\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[M]} | + \sum_{i=1}^{M-1} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[i]} | + \frac{1}{2} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[i]} | \right )$
+$E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha}) = \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[M]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[M]} | + \sum_{i=1}^{M-1} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[i]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[i]} | \right )$
 
 $E (\tilde{\mu},\tilde{\varphi}) = \sum_{\alpha=1}^{N} E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha})$
 
 ### The full construct recognition dynamics and neuronal activity
+
+Now combine recognition dynamics with full construct. 
+
+The gradient decrease scheme for the dynamical causal states:
+
+$\dot{\upsilon}_{\alpha [n]}^{[i]} - D {\upsilon}_{\alpha [n]}^{[i]} = -\kappa_{z} \hat{\upsilon}_{\alpha [n]}^{[i]} \nabla_{\tilde{\upsilon}_{\alpha}} E(\tilde{\mu},\tilde{\varphi})$
+
+Where we have (assume independent):
+
+$\hat{\upsilon}_{\alpha [n]}^{[i]} \nabla_{\tilde{\upsilon}_{\alpha}} E(\tilde{\mu},\tilde{\varphi}) = \frac{\partial}{\partial \upsilon_{\alpha [n]}^{[i]}} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i-1]}-\tilde{g}_{\alpha}^{[i]})^T (\Sigma_{z_\alpha}^{[i-1]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i-1]}-\tilde{g}_{\alpha}^{[i]}) + \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) \right )$
+
+$\frac{\partial}{\partial \upsilon_{\alpha [n]}^{[i]}} \left ( (\tilde{\upsilon}_{\alpha}^{[i-1]}-\tilde{g}_{\alpha}^{[i]})^T (\Sigma_{z_\alpha}^{[i-1]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i-1]}-\tilde{g}_{\alpha}^{[i]}) \right ) = 2 (\Sigma_{z_\alpha}^{[i-1]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i-1]}-\tilde{g}_{\alpha}^{[i]}) \left ( - \frac{\partial \tilde{g}_{\alpha}^{[i]}}{\partial \upsilon_{\alpha [n]}^{[i]}} \right )$ 
+
+$\frac{\partial}{\partial \upsilon_{\alpha [n]}^{[i]}} \left ( (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) \right ) = 2 (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})$
+
+$\frac{\partial}{\partial \upsilon_{\alpha [n]}^{[i]}} \left ( (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) \right )  = 2 (\Sigma_{w_\alpha}^{[i]})^{-1} (\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) \left ( - \frac{\partial \tilde{f}_{\alpha}^{[i]}}{\partial \upsilon_{\alpha [n]}^{[i]}} \right )$
+
+Define the *error units*, where $\sigma^{-1}$ can be called as *precisions*:
+
+$\xi_{z,\alpha [n]}^{[i]} \equiv (\sigma_{z, \alpha [n]}^{[i-1]})^{-1} ({\upsilon}_{\alpha [n]}^{[i-1]}-{g}_{\alpha [n]}^{[i]})$
+
+$\xi_{w,\alpha [n]}^{[i]} \equiv (\sigma_{w, \alpha [n]}^{[i]})^{-1} ({\chi}_{\alpha [n+1]}^{[i]}-{f}_{\alpha [n]}^{[i]})$
+
+Thus ${\upsilon}_{\alpha [n]}^{[i]}$ and ${\chi}_{\alpha [n]}^{[i]}$ similarly represent *state units* (*representation units*) within neuronal populations. 
+- In predictive coding (hierachical messages passing in cortical networks), the *error units* $\xi_{z,\alpha [n]}^{[i]}$ receive signals from lower-level causal states ${\upsilon}_{\alpha [n]}^{[i-1]}$, and also the same-level ${\upsilon}_{\alpha [n]}^{[i]}$ and ${\chi}_{\alpha [n]}^{[i]}$ via generative function ${g}_{\alpha [n]}^{[i]}$.
+- The *error units* $\xi_{w,\alpha [n]}^{[i]}$ specify prediction-error in the within-level dynamics, between the objective hidden state ${\chi}_{\alpha [n+1]}^{[i]}$ and its estimation from lower-level causal and hidden state ${\upsilon}_{\alpha [n]}^{[i]}$ and ${\chi}_{\alpha [n]}^{[i]}$ via the different generative function ${f}_{\alpha [n]}^{[i]}$.
+
+Therefore, we can write the dynamics of the causal state:
+
+$\dot{\upsilon}_{\alpha [n]}^{[i]} = D\upsilon_{\alpha [n]}^{[i]} + \kappa_{z} \left ( \frac{\partial {g}_{\alpha [n]}^{[i]}}{\partial \upsilon_{\alpha [n]}^{[i]}} \xi_{z,\alpha [n]}^{[i]} - \xi_{z,\alpha [n]}^{[i+1]} + \frac{\partial {f}_{\alpha [n]}^{[i]}}{\partial \upsilon_{\alpha [n]}^{[i]}} \xi_{w,\alpha [n]}^{[i]} \right )$
+
+Which shows that the hierarchical links are made among nearest neighbor cortical levels. The representation units of causal states $\upsilon_{\alpha [n]}^{[i]}$ are updated with higher-level error units $\xi_{z,\alpha [n]}^{[i+1]}$,  and the same-level error units $\xi_{z,\alpha [n]}^{[i]}$ and $\xi_{w,\alpha [n]}^{[i]}$.
+
+Similarly, we can write the dynamics of the hidden state:
+
+$\dot{\chi}_{\alpha [n]}^{[i]} = D{\chi}_{\alpha [n]}^{[i]} + \kappa_{w} \left ( - \xi_{w,\alpha [n-1]}^{[i]} + \frac{\partial {f}_{\alpha [n]}^{[i]}}{\partial \chi_{\alpha [n]}^{[i]}} \xi_{w,\alpha [n]}^{[i]} + \frac{\partial {g}_{\alpha [n]}^{[i]}}{\partial \chi_{\alpha [n]}^{[i]}} \xi_{z,\alpha [n]}^{[i]} \right )$
+
+Which shows that the representation units ${\chi}_{\alpha [n]}^{[i]}$ are updated with lower-level error units $\xi_{w,\alpha [n-1]}^{[i]}$, and the same-level error units $\xi_{w,\alpha [n]}^{[i]}$ and $\xi_{z,\alpha [n]}^{[i]}$.
+
+To summarize, prediction errors are passed up (bottom-up), and conditional expectations are passed down (top-down), consistent with predicticve coding.
+
+### Parameters and hyperparameters: Synaptic efficacy and gain
+
