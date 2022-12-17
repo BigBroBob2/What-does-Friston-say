@@ -179,9 +179,9 @@ $\frac{\partial}{\partial \upsilon_{\alpha [n]}^{[i]}} \left ( (\tilde{\chi}_{\a
 
 Define the *error units*, where $\sigma^{-1}$ can be called as *precisions*:
 
-$\xi_{z,\alpha [n]}^{[i]} \equiv (\sigma_{z, \alpha [n]}^{[i-1]})^{-1} ({\upsilon}_{\alpha [n]}^{[i-1]}-{g}_{\alpha [n]}^{[i]})$
+$\xi_{z,\alpha [n]}^{[i]} \equiv (\sigma_{z, \alpha [n]}^{[i-1]})^{-1} \left ( {\upsilon}_{\alpha [n]}^{[i-1]}-{g}_{\alpha [n]}^{[i]} (\chi_{\alpha [n]}^{[i]}, \upsilon_{\alpha [n]}^{[i]}) \right )$
 
-$\xi_{w,\alpha [n]}^{[i]} \equiv (\sigma_{w, \alpha [n]}^{[i]})^{-1} ({\chi}_{\alpha [n+1]}^{[i]}-{f}_{\alpha [n]}^{[i]})$
+$\xi_{w,\alpha [n]}^{[i]} \equiv (\sigma_{w, \alpha [n]}^{[i]})^{-1} \left ( {\chi}_{\alpha [n+1]}^{[i]}-{f}_{\alpha [n]}^{[i]} (\chi_{\alpha [n]}^{[i]}, \upsilon_{\alpha [n]}^{[i]}) \right )$
 
 Thus ${\upsilon}_{\alpha [n]}^{[i]}$ and ${\chi}_{\alpha [n]}^{[i]}$ similarly represent *state units* (*representation units*) within neuronal populations. 
 - In predictive coding (hierachical messages passing in cortical networks), the *error units* $\xi_{z,\alpha [n]}^{[i]}$ receive signals from lower-level causal states ${\upsilon}_{\alpha [n]}^{[i-1]}$, and also the same-level ${\upsilon}_{\alpha [n]}^{[i]}$ and ${\chi}_{\alpha [n]}^{[i]}$ via generative function ${g}_{\alpha [n]}^{[i]}$.
@@ -202,4 +202,54 @@ Which shows that the representation units ${\chi}_{\alpha [n]}^{[i]}$ are update
 To summarize, prediction errors are passed up (bottom-up), and conditional expectations are passed down (top-down), consistent with predicticve coding.
 
 ### Parameters and hyperparameters: Synaptic efficacy and gain
+
+We have shown that how world variables can be inferred by an appropriate G-density. We then discuss how the G-density can be learned. 
+
+There are 3 timescales in the dynamics of neural systems:
+- $\tau_{\mu}$ is the timescale of the fast dynamics of sufficient statistics of the encoded in R-density, $\mu \equiv (\chi,\upsilon)$.
+- $\tau_{\theta}$ and $\tau_{\gamma}$ are the timescales of the slow dynamics of synaptic efficates $\theta$ and gains $\gamma$ which are parameterized implicitly in the laplace-encoded energy $E(\mu,\varphi)$ via the generative funtions $f$ and $g$, and the variances $\Sigma$.
+
+$\tau_{\mu} < \tau_{\theta} < \tau_{\gamma}$
+
+Slow variables are assumed to be approximately static (time-invariant) in contrast to time-varying neuronal states $\mu$. In other words, with respect to a small $\delta t$, changes in $\theta$ and $\gamma$ are much smaller than changes in $\mu$:
+
+$\frac{\partial F}{\partial \theta} \frac{\delta \theta}{\delta t} \ll \frac{\partial F}{\partial \mu} \frac{\delta \mu}{\delta t}$
+
+$\frac{\partial F}{\partial \gamma} \frac{\delta \gamma}{\delta t} \ll \frac{\partial F}{\partial \mu} \frac{\delta \mu}{\delta t}$
+
+Recall VFE:
+
+$F = \int q(\vartheta)E(\vartheta,\varphi) d\vartheta + \int q(\vartheta) \ln q(\vartheta) d\vartheta$
+
+From the gradient decsent scheme, $\theta$ and $\gamma$ are not relevant to VFE but the integration of VFE over time, where the time-dependence of VFE is implicit through its arguments:
+
+$S[F] \equiv \int F(\tilde{\mu},\tilde{\varphi};\theta,\gamma) d t$
+
+Denote $\theta_{\alpha}^{[i]}$ as *parameters* and $\gamma_{\alpha}^{[i]}$ as *hyperparameters*, corresponding to brain state $\mu_{\alpha}^{[i]}$. Then *error units* can be generalized as:
+
+$\xi_{z,\alpha [n]}^{[i]} \equiv \left ( \sigma_{z, \alpha [n]}^{[i-1]} (\gamma_{\alpha}^{[i-1]}) \right )^{-1} \left ( {\upsilon}_{\alpha [n]}^{[i-1]}-{g}_{\alpha [n]}^{[i]} (\chi_{\alpha [n]}^{[i]}, \upsilon_{\alpha [n]}^{[i]};\theta_{\alpha}^{[i]}) \right )$
+
+$\xi_{w,\alpha [n]}^{[i]} \equiv \left ( \sigma_{w, \alpha [n]}^{[i]} (\gamma_{\alpha}^{[i]}) \right )^{-1} \left ( {\chi}_{\alpha [n+1]}^{[i]}-{f}_{\alpha [n]}^{[i]} (\chi_{\alpha [n]}^{[i]}, \upsilon_{\alpha [n]}^{[i]};\theta_{\alpha}^{[i]}) \right )$
+
+We can write the recognition dynamics for the slow synaptic efficacy $\theta$ and the slow synaptic gain $\gamma$. Note that the gradient decsent schemeis applied using the integration of VFE $S[F]$. Assume a static model without dynamical orders:
+
+$\dot{\theta}_{\alpha}^{[i]} = -\kappa_{\theta} \hat{\theta}_{\alpha}^{[i]} \nabla_{\theta_{\alpha}} S$
+
+$\dot{\gamma}_{\alpha}^{[i]} = -\kappa_{\gamma} \hat{\gamma}_{\alpha}^{[i]} \nabla_{\gamma_{\alpha}} S$
+
+And the second derivatives:
+
+$\ddot{\theta}_{\alpha}^{[i]} = -\kappa_{\theta} \hat{\theta}_{\alpha}^{[i]} \nabla_{\theta_{\alpha}} E(\tilde{\mu},\tilde{\varphi};\theta,\gamma) = \kappa_{\theta} \sum_{n=0}^{n_{\rm max}} \left ( \frac{\partial {g}_{\alpha [n]}^{[i]}}{\partial \theta_{\alpha}^{[i]}} \xi_{z,\alpha [n]}^{[i]} + \frac{\partial {f}_{\alpha [n]}^{[i]}}{\partial \theta_{\alpha}^{[i]}} \xi_{w,\alpha [n]}^{[i]} \right )$
+
+$\ddot{\gamma}_{\alpha}^{[i]} = -\kappa_{\gamma} \hat{\gamma}_{\alpha}^{[i]} \nabla_{\gamma_{\alpha}} E(\tilde{\mu},\tilde{\varphi};\theta,\gamma) = \kappa_{\gamma} \sum_{n=0}^{n_{\rm max}} \left ( -\frac{1}{2} \frac{\partial (\sigma_{z, \alpha [n]}^{[i]})^{-1}}{\partial \gamma_{\alpha}^{[i]}} (\sigma_{z, \alpha [n]}^{[i]})^{2} (\xi_{z,\alpha [n]}^{[i+1]})^{2} - \frac{\partial (\ln \sigma_{z, \alpha [n]}^{[i]})}{\partial \gamma_{\alpha}^{[i]}} -\frac{1}{2} \frac{\partial (\sigma_{w, \alpha [n]}^{[i]})^{-1}}{\partial \gamma_{\alpha}^{[i]}} (\sigma_{w, \alpha [n]}^{[i]})^{2} (\xi_{w,\alpha [n]}^{[i]})^{2} - \frac{\partial (\ln \sigma_{w, \alpha [n]}^{[i]})}{\partial \gamma_{\alpha}^{[i]}}  \right )$
+
+To summarize, FEP prescribes *recognition dynamics* by gradient descent schemes on the sufficient statistics $\tilde{\mu}$, parameters $\theta$, and hyperparameters $\gamma$ on the Laplace-encoded energy $E(\tilde{\mu},\tilde{\varphi};\theta,\gamma)$, given the sensory input $\tilde{\varphi}$. At the end of this process, we get an optimal $\tilde{\mu}^{*}$ that represents the brain's posterior expectation of the environmental cause of the observed data:
+
+$\tilde{\mu}^{*} = \arg \min_{\tilde{\mu}} F(\tilde{\mu},\tilde{\varphi})$
+
+$F^{*} = F(\tilde{\mu}^{*},\tilde{\varphi})$
+
+The only remaining task is to specify $f$ and $g$, which depend on the particular system being modelled. 
+
+### Active inference on the full construct
 
