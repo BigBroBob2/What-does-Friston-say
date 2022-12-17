@@ -155,7 +155,7 @@ $p(\tilde{\chi}_\alpha^{[M]}, \tilde{\upsilon}_\alpha^{[M]}) = \left ( \frac{1}{
 
 Therefore we have the Laplace-encoded energy:
 
-$E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha}) = \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[M]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[M]} | + \sum_{i=1}^{M-1} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[i]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[i]} | \right )$
+$E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha}) = \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[M]})^T (\Sigma_{z_\alpha}^{[M]})^{-1} (\tilde{\upsilon}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[M]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]})^T (\Sigma_{w_\alpha}^{[M]})^{-1} (D\tilde{\chi}_{\alpha}^{[M]} - \tilde{f}_{\alpha}^{[M]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[M]} | + \sum_{i=0}^{M-1} \left ( \frac{1}{2} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]})^T (\Sigma_{z_\alpha}^{[i]})^{-1} (\tilde{\upsilon}_{\alpha}^{[i]}-\tilde{g}_{\alpha}^{[i+1]}) + \frac{1}{2} \ln | \Sigma_{z_\alpha}^{[i]} | + \frac{1}{2} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]})^T (\Sigma_{w_\alpha}^{[i]})^{-1} (D\tilde{\chi}_{\alpha}^{[i]} - \tilde{f}_{\alpha}^{[i]}) + \frac{1}{2} \ln | \Sigma_{w_\alpha}^{[i]} | \right )$
 
 $E (\tilde{\mu},\tilde{\varphi}) = \sum_{\alpha=1}^{N} E_{\alpha} (\tilde{\mu}_{\alpha},\tilde{\varphi}_{\alpha})$
 
@@ -252,4 +252,20 @@ $F^{*} = F(\tilde{\mu}^{*},\tilde{\varphi})$
 The only remaining task is to specify $f$ and $g$, which depend on the particular system being modelled. 
 
 ### Active inference on the full construct
+
+VFE accounts for active inference by minimizing VFE with respect to action:
+
+$a^{*} = \arg \min_{a} F(\tilde{\mu},\tilde{\varphi} (a))$
+
+Where $a^{*}$ is the optimal action. Similarly we can write down the gradient descent scheme for the minimization in the full construct for action corresponding to brain's representation units $\mu_{\alpha}$:
+
+$\dot{a}_{\alpha} = - \kappa_{a} \hat{a}_{\alpha} \nabla_{a_{\alpha}} E(\tilde{\mu},\tilde{\varphi} (a))$
+
+Remember that the sensory input $\tilde{\varphi}$ is the lowest level of the causal states $\tilde{\upsilon}_{\alpha}^{[0]}$:
+
+$\tilde{\varphi} = \tilde{\upsilon}_{\alpha}^{[0]}$
+
+Therefore we have:
+
+$\dot{a}_{\alpha} = -\kappa_{a} \sum_{n=0}^{n_{\rm max}} \frac{d \tilde{\varphi}_{\alpha[n]}}{d a_{\alpha}} \xi_{z, \alpha [n]}^{[1]}$
 
